@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f7f8fc" />
+    <title>타자 기록표</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <strong>타자 기록표</strong>
+        </div>
+        <button class="text-button" id="logoutButton" type="button" hidden>다른 학번으로 보기</button>
+      </header>
+
+      <section class="hero">
+        <div>
+          <p class="eyebrow">나의 타자 성장 기록</p>
+          <h1>오늘의 기록을 남겨보세요</h1>
+        </div>
+        <div class="status-pill" id="storageStatus">
+          <span class="status-dot"></span>
+          로컬 저장 모드
+        </div>
+      </section>
+
+      <section class="card login-card" id="loginSection">
+        <div class="section-heading">
+          <div>
+            <p class="step">01</p>
+            <h2>학번으로 시작하기</h2>
+          </div>
+          <p>처음이라면 비밀번호를 새로 지정하세요.</p>
+        </div>
+
+        <form id="loginForm" class="login-form">
+          <label>
+            학번
+            <input id="studentId" name="studentId" type="text" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="예: 1204" required />
+          </label>
+          <label>
+            비밀번호 4자리
+            <input id="password" name="password" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="숫자 4자리" required />
+          </label>
+          <button class="primary-button" type="submit">기록 보기</button>
+        </form>
+        <p class="form-message" id="loginMessage" role="alert"></p>
+      </section>
+
+      <section class="dashboard" id="dashboard" hidden>
+        <div class="dashboard-grid">
+          <article class="card record-card">
+            <div class="section-heading">
+              <div>
+                <p class="step">02</p>
+                <h2>새 기록 입력</h2>
+              </div>
+              <p id="todayLabel"></p>
+            </div>
+
+            <form id="recordForm" class="record-form">
+              <label>
+                한글 타자
+                <div class="input-with-unit">
+                  <input id="koreanScore" name="koreanScore" type="number" min="0" max="9999" step="1" placeholder="0" required />
+                  <span>타</span>
+                </div>
+              </label>
+              <label>
+                영어 타자
+                <div class="input-with-unit">
+                  <input id="englishScore" name="englishScore" type="number" min="0" max="9999" step="1" placeholder="0" required />
+                  <span>타</span>
+                </div>
+              </label>
+              <button class="primary-button" type="submit">기록 저장</button>
+            </form>
+            <p class="form-message" id="recordMessage" role="status"></p>
+          </article>
+
+          <article class="card summary-card">
+            <p class="summary-label">최고 기록</p>
+            <div class="summary-row">
+              <div>
+                <span>한글</span>
+                <strong id="koreanBest">0</strong>
+                <small>타</small>
+              </div>
+              <div>
+                <span>영어</span>
+                <strong id="englishBest">0</strong>
+                <small>타</small>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <article class="card chart-card">
+          <div class="chart-header">
+            <div>
+              <p class="step">03</p>
+              <h2>성장 그래프</h2>
+            </div>
+            <div class="legend">
+              <span><i class="korean-line"></i> 한글</span>
+              <span><i class="english-line"></i> 영어</span>
+            </div>
+          </div>
+          <div class="chart-wrap" id="chartWrap">
+            <svg id="chart" role="img" aria-label="날짜별 한글 및 영어 타자 기록 그래프"></svg>
+            <div class="empty-chart" id="emptyChart">
+              아직 저장된 기록이 없습니다.
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="./supabase-config.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
