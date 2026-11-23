@@ -15,6 +15,8 @@ py -m http.server 4173
 
 ## Supabase 연동
 
+자세한 절차는 [SUPABASE_SETUP.md](./SUPABASE_SETUP.md)를 참고하세요.
+
 1. Supabase 프로젝트의 SQL Editor에서 `supabase-schema.sql`을 실행합니다.
 2. Supabase 프로젝트 설정의 API에서 Project URL과 anon/public key를 확인합니다.
 3. `supabase-config.js`의 `url`과 `anonKey`에 값을 입력합니다.
