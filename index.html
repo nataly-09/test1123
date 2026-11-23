@@ -62,12 +62,16 @@
             <div class="section-heading">
               <div>
                 <p class="step">02</p>
-                <h2>새 기록 입력</h2>
+                <h2 id="recordTitle">새 기록 입력</h2>
               </div>
               <p id="todayLabel"></p>
             </div>
 
             <form id="recordForm" class="record-form">
+              <label>
+                기록 날짜
+                <input id="recordDate" name="recordDate" type="date" required />
+              </label>
               <label>
                 한글 타자
                 <div class="input-with-unit">
@@ -82,7 +86,10 @@
                   <span>타</span>
                 </div>
               </label>
-              <button class="primary-button" type="submit">기록 저장</button>
+              <div class="record-actions">
+                <button class="primary-button" id="saveRecordButton" type="submit">기록 저장</button>
+                <button class="secondary-button" id="cancelEditButton" type="button" hidden>취소</button>
+              </div>
             </form>
             <p class="form-message" id="recordMessage" role="status"></p>
           </article>
@@ -121,6 +128,16 @@
               아직 저장된 기록이 없습니다.
             </div>
           </div>
+        </article>
+
+        <article class="card history-card">
+          <div class="chart-header">
+            <div>
+              <p class="step">04</p>
+              <h2>기록 목록</h2>
+            </div>
+          </div>
+          <div class="history-list" id="historyList"></div>
         </article>
       </section>
     </main>

@@ -15,3 +15,6 @@ create table if not exists public.typing_records (
 
 create index if not exists typing_records_student_date_idx
   on public.typing_records (student_id, recorded_at);
+
+create unique index if not exists typing_records_student_date_unique
+  on public.typing_records (student_id, recorded_at);

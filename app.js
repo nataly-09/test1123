@@ -1,6 +1,7 @@
 const state = {
   studentId: null,
-  records: []
+  records: [],
+  editingDate: null
 };
 
 const loginForm = document.querySelector("#loginForm");
@@ -96,9 +97,7 @@ async function authenticateStudent(studentId, password) {
   );
 }
 
-async function saveRecord(koreanScore, englishScore) {
-  const recordedAt = new Date();
-  const date = `${recordedAt.getFullYear()}-${String(recordedAt.getMonth() + 1).padStart(2, "0")}-${String(recordedAt.getDate()).padStart(2, "0")}`;
+async function saveRecord(koreanScore, englishScore, date) {
   const record = {
     korean_score: koreanScore,
     english_score: englishScore,
@@ -148,14 +147,73 @@ function renderDashboard(records) {
   loginSection.hidden = true;
   logoutButton.hidden = false;
 
-  document.querySelector("#todayLabel").textContent =
-    new Intl.DateTimeFormat("ko-KR", { month: "long", day: "numeric" }).format(new Date());
+  const recordDate = document.querySelector("#recordDate");
+  const today = toDateInputValue(new Date());
+  recordDate.max = today;
+  if (!recordDate.value) recordDate.value = today;
 
   const koreanBest = state.records.reduce((best, item) => Math.max(best, item.korean), 0);
   const englishBest = state.records.reduce((best, item) => Math.max(best, item.english), 0);
   document.querySelector("#koreanBest").textContent = koreanBest.toLocaleString("ko-KR");
   document.querySelector("#englishBest").textContent = englishBest.toLocaleString("ko-KR");
+  document.querySelector("#todayLabel").textContent =
+    new Intl.DateTimeFormat("ko-KR", { year: "numeric", month: "long", day: "numeric" }).format(new Date());
   renderChart();
+  renderHistory();
+}
+
+function toDateInputValue(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function renderHistory() {
+  const historyList = document.querySelector("#historyList");
+  if (!state.records.length) {
+    historyList.innerHTML = '<div class="empty-history">아직 저장된 기록이 없습니다.</div>';
+    return;
+  }
+
+  historyList.innerHTML = [...state.records].reverse().map((record) =>
+    `<div class="history-row">
+      <strong>${shortDate(record.date)}</strong>
+      <span>한글 ${record.korean.toLocaleString("ko-KR")}타</span>
+      <span>영어 ${record.english.toLocaleString("ko-KR")}타</span>
+      <button class="edit-button" type="button" data-date="${record.date}">수정</button>
+    </div>`
+  ).join("");
+
+  historyList.querySelectorAll(".edit-button").forEach((button) => {
+    button.addEventListener("click", () => startEditing(button.dataset.date));
+  });
+}
+
+function startEditing(date) {
+  const record = state.records.find((item) => item.date === date);
+  if (!record) return;
+
+  state.editingDate = date;
+  const recordDate = document.querySelector("#recordDate");
+  recordDate.value = date;
+  recordDate.disabled = true;
+  document.querySelector("#koreanScore").value = record.korean;
+  document.querySelector("#englishScore").value = record.english;
+  document.querySelector("#recordTitle").textContent = "기록 수정";
+  document.querySelector("#saveRecordButton").textContent = "수정 저장";
+  document.querySelector("#cancelEditButton").hidden = false;
+  document.querySelector("#recordMessage").textContent = "";
+  document.querySelector("#recordForm").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function resetEditing() {
+  state.editingDate = null;
+  recordForm.reset();
+  const recordDate = document.querySelector("#recordDate");
+  recordDate.disabled = false;
+  recordDate.value = toDateInputValue(new Date());
+  document.querySelector("#recordTitle").textContent = "새 기록 입력";
+  document.querySelector("#saveRecordButton").textContent = "기록 저장";
+  document.querySelector("#cancelEditButton").hidden = true;
+  document.querySelector("#recordMessage").textContent = "";
 }
 
 function shortDate(dateString) {
@@ -250,9 +308,15 @@ loginForm.addEventListener("submit", async (event) => {
 recordForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const message = document.querySelector("#recordMessage");
+  const date = document.querySelector("#recordDate").value;
   const koreanScore = Number(document.querySelector("#koreanScore").value);
   const englishScore = Number(document.querySelector("#englishScore").value);
   message.className = "form-message";
+
+  if (!date) {
+    message.textContent = "기록 날짜를 선택해 주세요.";
+    return;
+  }
 
   if (!Number.isFinite(koreanScore) || !Number.isFinite(englishScore) ||
       koreanScore < 0 || englishScore < 0) {
@@ -261,15 +325,17 @@ recordForm.addEventListener("submit", async (event) => {
   }
 
   try {
-    const records = await saveRecord(koreanScore, englishScore);
+    const records = await saveRecord(koreanScore, englishScore, date);
     renderDashboard(records);
-    recordForm.reset();
+    resetEditing();
     message.className = "form-message success";
-    message.textContent = "오늘의 기록이 저장되었습니다.";
+    message.textContent = "기록이 저장되었습니다.";
   } catch (error) {
     message.textContent = error.message;
   }
 });
+
+document.querySelector("#cancelEditButton").addEventListener("click", resetEditing);
 
 logoutButton.addEventListener("click", () => {
   state.studentId = null;
